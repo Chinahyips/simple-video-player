@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useTheme } from '../composables/useTheme'
 import { useWindowSize } from '@vueuse/core'
@@ -45,13 +45,20 @@ const MAX_RATIO = 0.75 // 最大比例 75%
 // 计算标题
 const pageTitle = computed(() => {
   if (!config.value?.customTitle) {
-    return '简单视频播放器'
+    return '尚品良品 在线视频播放福利站'
   }
   const title = String(config.value.customTitle).trim()
   if (title === 'false' || title === '') {
     return ''
   }
   return title
+})
+
+// 监听pageTitle的变化，更新文档标题
+watch(pageTitle, (newTitle) => {
+  if (newTitle) {
+    document.title = newTitle
+  }
 })
 
 // 检查登录状态并加载配置
@@ -86,6 +93,10 @@ const loadConfig = async () => {
 onMounted(async () => {
   try {
     await loadConfig()
+    // 设置文档标题
+    if (pageTitle.value) {
+      document.title = pageTitle.value
+    }
   } finally {
     isLoading.value = false
   }
